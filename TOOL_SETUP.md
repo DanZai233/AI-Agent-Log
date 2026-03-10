@@ -26,7 +26,11 @@
 - 表名：`ItemTable`
 - 对话类型：`type = 'chat'`
 
-#### 如何访问对话历史
+#### ⚠️ 重要说明
+
+**Cursor 不保存 AI 对话历史到本地** - 本地只包含编辑历史和设置。
+
+#### 如何导出对话历史
 1. 打开 Cursor
 2. 按 `Cmd + Shift + P` (Mac) 或 `Ctrl + Shift + P` (Windows/Linux)
 3. 输入 "Chat: Show History" 或直接点击左侧历史图标
@@ -65,7 +69,11 @@ ls ~/Library/Application\ Support/Cursor/User/GlobalStorage/*.db
 - JSON 配置文件：`claude_desktop_config.json`
 - LevelDB 数据库：`Local Storage/leveldb/`
 
-#### 如何访问对话历史
+#### ⚠️ 重要说明
+
+**Cursor 不保存 AI 对话历史到本地** - 本地只包含编辑历史和设置。
+
+#### 如何导出对话历史
 1. 打开 Claude Desktop
 2. 点击左侧边栏的 "Chat History"
 3. 所有对话会自动保存到上述位置
@@ -100,7 +108,11 @@ ls ~/Library/Application\ Support/Cursor/User/GlobalStorage/*.db
 - JSON 文件：`settings.json` 或 `history.json`
 - 包含所有对话和元数据
 
-#### 如何访问对话历史
+#### ⚠️ 重要说明
+
+**Cursor 不保存 AI 对话历史到本地** - 本地只包含编辑历史和设置。
+
+#### 如何导出对话历史
 1. 打开 OpenCode
 2. 查看 "Chat" 面板
 3. 对话会自动保存
