@@ -4,6 +4,23 @@ import Database from 'better-sqlite3';
 
 const db = new Database('logs.db');
 
+// Database migration
+try {
+  const tableInfo = db.prepare("PRAGMA table_info(logs)").all() as Array<{ name: string }>;
+  const columns = tableInfo.map(col => col.name);
+
+  // Check if model column exists
+  if (!columns.includes('model')) {
+    console.log('🔄 Migrating database: Adding model column...');
+    db.exec('ALTER TABLE logs ADD COLUMN model TEXT');
+    console.log('✅ Migration complete');
+  }
+} catch (error) {
+  // If table doesn't exist, it will be created below
+  console.log('Table does not exist yet, will create on startup');
+}
+
+// Create table if it doesn't exist
 db.exec(`
   CREATE TABLE IF NOT EXISTS logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
