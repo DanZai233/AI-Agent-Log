@@ -9,7 +9,14 @@
     "start": "node server.ts",
     "preview": "vite preview",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "import": "tsx examples/auto-import-cli.ts",
+    "import:scan": "tsx examples/auto-import-cli.ts scan",
+    "import:all": "tsx examples/auto-import-cli.ts all",
+    "import:cursor": "tsx examples/auto-import-cli.ts import cursor",
+    "import:claude": "tsx examples/auto-import-cli.ts import claude-code",
+    "import:opencode": "tsx examples/auto-import-cli.ts import opencode",
+    "import:copilot": "tsx examples/auto-import-cli.ts import vscode-copilot"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",

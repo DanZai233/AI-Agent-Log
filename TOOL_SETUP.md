@@ -163,7 +163,7 @@ SERVER_PID=$!
 sleep 5
 
 # 导入所有工具
-node examples/auto-import-cli.ts all
+npm run import all
 
 # 停止服务
 kill $SERVER_PID
@@ -176,7 +176,7 @@ kill $SERVER_PID
 **Linux/Mac (crontab)**
 ```bash
 # 每周日凌晨 2 点自动导入
-0 2 * * 0 cd /path/to/AI-Agent-Log && node examples/auto-import-cli.ts all
+0 2 * * 0 cd /path/to/AI-Agent-Log && npm run import all
 ```
 
 **Windows (任务计划程序)**

@@ -58,7 +58,7 @@ npm run dev
 #### 扫描已安装的工具
 
 ```bash
-node examples/auto-import-cli.ts scan
+npm run import scan
 ```
 
 输出示例：
@@ -76,17 +76,17 @@ node examples/auto-import-cli.ts scan
 To import conversations, run:
 
   # Import from all tools
-  node examples/auto-import-cli.ts all
+  npm run import all
 
   # Import from specific tool
-  node examples/auto-import-cli.ts import cursor
+  npm run import import cursor
 ```
 
 #### 从所有工具导入
 
 ```bash
 # 一键导入所有工具的对话
-node examples/auto-import-cli.ts all
+npm run import all
 ```
 
 这会自动：
@@ -137,16 +137,16 @@ Total errors: 0
 
 ```bash
 # 只导入 Cursor 的对话
-node examples/auto-import-cli.ts import cursor
+npm run import import cursor
 
 # 只导入 ClaudeCode 的对话
-node examples/auto-import-cli.ts import claude-code
+npm run import import claude-code
 
 # 只导入 OpenCode 的对话
-node examples/auto-import-cli.ts import opencode
+npm run import import opencode
 
 # 只导入 VS Code Copilot 的对话
-node examples/auto-import-cli.ts import vscode-copilot
+npm run import import vscode-copilot
 ```
 
 #### 支持的工具和位置

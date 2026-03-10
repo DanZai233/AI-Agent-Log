@@ -7,21 +7,21 @@
 ### 扫描已安装的工具
 
 ```bash
-node examples/auto-import-cli.ts scan
+npm run import scan
 ```
 
 ### 一键导入所有对话
 
 ```bash
-node examples/auto-import-cli.ts all
+npm run import all
 ```
 
 ### 从特定工具导入
 
 ```bash
-node examples/auto-import-cli.ts import cursor
-node examples/auto-import-cli.ts import claude-code
-node examples/auto-import-cli.ts import opencode
+npm run import import cursor
+npm run import import claude-code
+npm run import import opencode
 ```
 
 **支持的工具**：Cursor、ClaudeCode、OpenCode、VS Code Copilot
