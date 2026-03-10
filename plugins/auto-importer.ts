@@ -71,16 +71,46 @@ export class AutoImporter {
   /**
    * Scan for all installed AI coding tools
    */
-  async scanInstalledTools(): Promise<ToolInfo[]> {
+  async scanInstalledTools(debug: boolean = false): Promise<ToolInfo[]> {
     const installed: ToolInfo[] = [];
 
+    if (debug) {
+      console.log('\n🔍 Debug: Scanning all configured paths...\n');
+    }
+
     for (const tool of this.tools) {
+      if (debug) {
+        console.log(`\n🔍 Checking ${tool.displayName}:`);
+        console.log(`   Config paths:`);
+        for (const p of tool.configPaths) {
+          const exists = await this.pathExists(p);
+          console.log(`     ${exists ? '✓' : '✗'} ${p}`);
+        }
+        console.log(`   DB paths:`);
+        for (const p of tool.dbPaths) {
+          const exists = await this.pathExists(p);
+          console.log(`     ${exists ? '✓' : '✗'} ${p}`);
+        }
+      }
+
       if (await this.isToolInstalled(tool)) {
         installed.push(tool);
       }
     }
 
     return installed;
+  }
+
+  /**
+   * Helper to check if path exists
+   */
+  private async pathExists(p: string): Promise<boolean> {
+    try {
+      await fs.access(p);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   /**
@@ -158,7 +188,7 @@ export class AutoImporter {
   /**
    * Import conversations from a specific tool
    */
-  async importFromTool(toolName: string): Promise<{
+  async importFromTool(toolName: string, debug: boolean = false, customPath?: string): Promise<{
     success: boolean;
     tool: string;
     imported: number;
@@ -170,13 +200,17 @@ export class AutoImporter {
     }
 
     console.log(`\n🔍 Scanning ${tool.displayName}...`);
-
-    const dataPath = await this.getToolDataPath(toolName);
+    
+    // Use custom path if provided
+    const dataPath = customPath || await this.getToolDataPath(toolName);
     if (!dataPath) {
       throw new Error(`${tool.displayName} not found or no data available`);
     }
 
     console.log(`📁 Found data at: ${dataPath}`);
+    if (debug) {
+      console.log(`   Custom path: ${customPath ? customPath : 'auto-detected'}`);
+    }
 
     try {
       let conversations = [];
