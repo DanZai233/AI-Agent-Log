@@ -87,9 +87,9 @@ async function scanTools() {
 
     console.log('To import conversations, run:\n');
     console.log('  # Import from all tools');
-    console.log('  node examples/auto-import-cli.ts all\n');
+    console.log('  npm run import all\n');
     console.log('  # Import from specific tool');
-    console.log('  node examples/auto-import-cli.ts import cursor\n');
+    console.log('  npm run import import cursor\n');
 
   } catch (error: any) {
     console.error(`❌ Scan failed: ${error.message}`);
@@ -99,7 +99,7 @@ async function scanTools() {
 async function importTool(toolName: string) {
   if (!toolName) {
     console.error('❌ Error: Please specify a tool name\n');
-    console.log('Usage: node examples/auto-import-cli.ts import <tool-name>\n');
+    console.log('Usage: npm run import import <tool-name>\n');
     console.log('Available tools:');
     await listTools();
     process.exit(1);
@@ -211,7 +211,7 @@ AI Agent Log - Auto Importer
 Automatically detect and import conversations from AI coding tools.
 
 Usage:
-  node examples/auto-import-cli.ts <command> [arguments]
+  npm run import <command> [arguments]
 
 Commands:
   scan              Scan for installed AI coding tools
@@ -228,13 +228,13 @@ Supported Tools:
 
 Examples:
   # Scan for installed tools
-  node examples/auto-import-cli.ts scan
+  npm run import scan
 
   # Import from Cursor
-  node examples/auto-import-cli.ts import cursor
+  npm run import import cursor
 
   # Import from all tools
-  node examples/auto-import-cli.ts all
+  npm run import all
 
 Environment Variables:
   AGENT_LOG_URL      Agent Log server URL (default: http://localhost:3000/api/logs)
