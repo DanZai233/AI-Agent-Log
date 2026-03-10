@@ -28,6 +28,8 @@ export class AutoImporter {
         path.join(os.homedir(), 'Library/Application Support/Cursor/User/GlobalStorage/state.vscdb'),
         path.join(os.homedir(), '.config/Cursor/User/GlobalStorage/state.vscdb'),
         path.join(process.env.APPDATA || '', 'Cursor/User/GlobalStorage/state.vscdb'),
+        path.join(os.homedir(), 'Library/Application Support/Cursor/User/History'),
+        path.join(os.homedir(), 'Library/Application Support/Cursor/User/workspaceStorage'),
       ],
     },
     {
@@ -198,13 +200,96 @@ export class AutoImporter {
    * Import from Cursor's SQLite database
    */
   private async importCursor(dataPath: string): Promise<any[]> {
-    // Cursor stores data in SQLite (VSCode format)
-    try {
-      const Database = (await import('better-sqlite3')).default;
-      const db = new Database(dataPath);
+    console.log('🔍 Attempting to import from Cursor...');
+    console.log(`   Path: ${dataPath}`);
 
-      // Cursor's conversation table structure
-      const conversations = db.prepare(`
+    const stats = await fs.stat(dataPath);
+    console.log(`   Type: ${stats.isDirectory() ? 'directory' : 'file'}`);
+
+    // If it's a directory, search for database files
+    if (stats.isDirectory()) {
+      console.log('   Scanning directory for database files...');
+      const entries = await fs.readdir(dataPath);
+      console.log(`   Found ${entries.length} entries`);
+      
+      // Try to find SQLite databases
+      const dbFiles = entries.filter(e => e.endsWith('.db') || e.endsWith('.sqlite') || e.endsWith('.sqlite3'));
+      if (dbFiles.length > 0) {
+        console.log(`   Found databases: ${dbFiles.join(', ')}`);
+        
+        for (const dbFile of dbFiles) {
+          const dbPath = path.join(dataPath, dbFile);
+          try {
+            const result = await this.readCursorDatabase(dbPath);
+            if (result.length > 0) {
+              console.log(`   ✅ Successfully read ${result.length} conversations from ${dbFile}`);
+              return result;
+            }
+          } catch (error) {
+            console.warn(`   Failed to read ${dbFile}:`, error.message);
+          }
+        }
+      }
+
+      // Try to find JSON files in subdirectories
+      console.log('   Scanning for conversation JSON files...');
+      for (const entry of entries) {
+        if (entry.startsWith('-') && !entry.includes('.')) {
+          // These look like session directories
+          const sessionPath = path.join(dataPath, entry);
+          try {
+            const sessionEntries = await fs.readdir(sessionPath);
+            const entriesFile = sessionEntries.find(e => e === 'entries.json');
+            if (entriesFile) {
+              console.log(`   Found entries.json in ${entry}`);
+              const result = await this.readCursorEntries(path.join(sessionPath, entriesFile));
+              if (result.length > 0) {
+                console.log(`   ✅ Successfully read ${result.length} entries`);
+                return result;
+              }
+            }
+          } catch (error) {
+            continue;
+          }
+        }
+      }
+
+      console.warn('   No conversations found in directory');
+      return [];
+    }
+
+    // If it's a file, try to read as database
+    if (dataPath.endsWith('.db') || dataPath.endsWith('.sqlite') || dataPath.endsWith('.sqlite3')) {
+      try {
+        return await this.readCursorDatabase(dataPath);
+      } catch (error) {
+        console.warn('Could not read as database:', error.message);
+      }
+    }
+
+    // Fallback to JSON
+    console.log('   Trying JSON format...');
+    return this.importJSON(dataPath);
+  }
+
+  /**
+   * Read Cursor SQLite database
+   */
+  private async readCursorDatabase(dbPath: string): Promise<any[]> {
+    console.log(`   Opening database: ${dbPath}`);
+    const Database = (await import('better-sqlite3')).default;
+    const db = new Database(dbPath, { readonly: true });
+
+    // Try different table names
+    const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as Array<{ name: string }>;
+    console.log(`   Tables in database: ${tables.map(t => t.name).join(', ')}`);
+
+    let conversations = [];
+    
+    // Try ItemTable (VSCode format)
+    if (tables.some(t => t.name === 'ItemTable')) {
+      console.log('   Using ItemTable');
+      conversations = db.prepare(`
         SELECT 
           json_extract(data, '$.messages') as messages,
           json_extract(data, '$.model') as model,
@@ -214,28 +299,78 @@ export class AutoImporter {
         ORDER BY timestamp DESC
         LIMIT 500
       `).all();
-
-      const formatted = [];
-
-      for (const conv of conversations) {
-        try {
-          const messages = JSON.parse(conv.messages || '[]');
-          const conversation = this.parseMessages(messages, 'Cursor', conv.model, conv.created_at);
-          if (conversation) {
-            formatted.push(conversation);
-          }
-        } catch (error) {
-          console.warn('Failed to parse conversation:', error);
-        }
-      }
-
-      db.close();
-      return formatted;
-    } catch (error) {
-      console.warn('Could not read Cursor database, trying JSON format...');
-      // Fallback to JSON
-      return this.importJSON(dataPath);
     }
+
+    // Try messages table
+    if (conversations.length === 0 && tables.some(t => t.name === 'messages')) {
+      console.log('   Using messages table');
+      conversations = db.prepare(`
+        SELECT 
+          json_extract(content, '$') as data,
+          model,
+          timestamp as created_at
+        FROM messages
+        ORDER BY timestamp DESC
+        LIMIT 500
+      `).all();
+    }
+
+    // Try conversations table
+    if (conversations.length === 0 && tables.some(t => t.name === 'conversations')) {
+      console.log('   Using conversations table');
+      conversations = db.prepare(`
+        SELECT * FROM conversations
+        ORDER BY timestamp DESC
+        LIMIT 500
+      `).all();
+    }
+
+    db.close();
+    console.log(`   Found ${conversations.length} conversation records`);
+
+    const formatted = [];
+    
+    for (const conv of conversations) {
+      try {
+        let messages = [];
+        if (conv.messages) {
+          messages = JSON.parse(conv.messages);
+        } else if (conv.data) {
+          messages = JSON.parse(conv.data);
+        } else if (conv.content) {
+          const parsed = JSON.parse(conv.content);
+          messages = parsed.messages || parsed;
+        }
+
+        const conversation = this.parseMessages(messages, 'Cursor', conv.model, conv.created_at);
+        if (conversation) {
+          formatted.push(conversation);
+        }
+      } catch (error) {
+        console.warn('   Failed to parse conversation:', error);
+      }
+    }
+
+    return formatted;
+  }
+
+  /**
+   * Read Cursor entries.json files
+   */
+  private async readCursorEntries(entriesPath: string): Promise<any[]> {
+    console.log(`   Reading entries.json: ${entriesPath}`);
+    const content = await fs.readFile(entriesPath, 'utf-8');
+    const data = JSON.parse(content);
+
+    // Check if it has entries array
+    if (data.entries && Array.isArray(data.entries)) {
+      console.log(`   Found ${data.entries.length} entries`);
+      // These are edit history entries, not conversations
+      // We can extract context but not actual AI conversations
+      return [];
+    }
+
+    return [];
   }
 
   /**
