@@ -1,0 +1,5 @@
+{
+  "name": "AI Agent Log Manager",
+  "description": "Collects and manages conversation logs with various AI agents (Cursor, ClaudeCode, etc.) and provides daily AI-generated summaries of tasks accomplished.",
+  "requestFramePermissions": []
+}
