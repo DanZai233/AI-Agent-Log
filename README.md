@@ -51,6 +51,120 @@ npm run dev
 
 ## 📖 使用教程
 
+### 方式零：一键自动导入（推荐）⭐
+
+这是最简单的方式！自动检测并导入你电脑上所有 AI 工具的对话记录。
+
+#### 扫描已安装的工具
+
+```bash
+node examples/auto-import-cli.ts scan
+```
+
+输出示例：
+```
+🔍 Scanning for installed AI coding tools...
+
+✅ Found 2 tool(s):
+
+  ✓ Cursor
+    📁 /Users/xxx/Library/Application Support/Cursor/User/GlobalStorage/state.vscdb
+
+  ✓ ClaudeCode / Claude Desktop
+    📁 /Users/xxx/Library/Application Support/Claude/Local Storage/leveldb
+
+To import conversations, run:
+
+  # Import from all tools
+  node examples/auto-import-cli.ts all
+
+  # Import from specific tool
+  node examples/auto-import-cli.ts import cursor
+```
+
+#### 从所有工具导入
+
+```bash
+# 一键导入所有工具的对话
+node examples/auto-import-cli.ts all
+```
+
+这会自动：
+- ✅ 扫描你电脑上已安装的 AI 工具
+- ✅ 读取每个工具的对话历史
+- ✅ 自动转换为统一格式
+- ✅ 批量导入到 Agent Log
+
+输出示例：
+```
+🔄 Importing from all installed tools...
+
+Found 2 tool(s) to import from:
+
+──────────────────────────────────────────────────
+Importing from Cursor...
+──────────────────────────────────────────────────
+🔍 Scanning Cursor...
+📁 Found data at: /Users/xxx/.../state.vscdb
+✅ Found 150 conversations
+📤 Sending 150 conversations to server...
+✅ Imported 150/150 conversations
+
+══════════════════════════════════════════
+📊 Import Summary
+
+   Tool: Cursor
+   Status: ✅ Success
+   Imported: 150 conversations
+
+[...ClaudeCode 导入结果...]
+
+══════════════════════════════════════════
+📊 Overall Import Summary
+
+✅ Cursor                         150 conversations
+✅ ClaudeCode / Claude Desktop        80 conversations
+──────────────────────────────────────────────────
+Total imported: 230 conversations
+Total errors: 0
+══════════════════════════════════════════
+
+✨ All done! View your conversations at:
+   http://localhost:3000
+```
+
+#### 从特定工具导入
+
+```bash
+# 只导入 Cursor 的对话
+node examples/auto-import-cli.ts import cursor
+
+# 只导入 ClaudeCode 的对话
+node examples/auto-import-cli.ts import claude-code
+
+# 只导入 OpenCode 的对话
+node examples/auto-import-cli.ts import opencode
+
+# 只导入 VS Code Copilot 的对话
+node examples/auto-import-cli.ts import vscode-copilot
+```
+
+#### 支持的工具和位置
+
+| 工具 | 配置文件位置 (macOS) | 配置文件位置 (Linux) | 配置文件位置 (Windows) |
+|--------|------------------------|----------------------|--------------------------|
+| **Cursor** | `~/Library/Application Support/Cursor/User/GlobalStorage/` | `~/.config/Cursor/User/GlobalStorage/` | `%APPDATA%/Cursor/User/GlobalStorage/` |
+| **ClaudeCode** | `~/Library/Application Support/Claude/` | `~/.config/Claude/` | `%APPDATA%/Claude/` |
+| **OpenCode** | `~/Library/Application Support/OpenCode/User/` | `~/.config/OpenCode/User/` | `%APPDATA%/OpenCode/User/` |
+| **VS Code Copilot** | `~/Library/Application Support/Code/User/` | `~/.config/Code/User/` | `%APPDATA%/Code/User/` |
+
+**注意**：
+- 只导入最近 500 条对话（避免导入过多）
+- 导入前请确保 Agent Log 服务正在运行：`npm run dev`
+- 首次导入可能需要几分钟
+
+---
+
 ### 方式一：Web 界面手动添加
 
 #### 步骤 1：添加日志

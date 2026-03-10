@@ -1,5 +1,35 @@
 # 快速开始指南
 
+## 0. 一键自动导入（推荐）⭐
+
+这是最简单的方式！自动导入你电脑上所有 AI 工具的对话记录。
+
+### 扫描已安装的工具
+
+```bash
+node examples/auto-import-cli.ts scan
+```
+
+### 一键导入所有对话
+
+```bash
+node examples/auto-import-cli.ts all
+```
+
+### 从特定工具导入
+
+```bash
+node examples/auto-import-cli.ts import cursor
+node examples/auto-import-cli.ts import claude-code
+node examples/auto-import-cli.ts import opencode
+```
+
+**支持的工具**：Cursor、ClaudeCode、OpenCode、VS Code Copilot
+
+查看完整文档：[README.md](./README.md#方式零一键自动导入推荐)
+
+---
+
 ## 1. 启动服务
 
 ```bash
