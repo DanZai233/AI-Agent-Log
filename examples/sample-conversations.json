@@ -1,0 +1,58 @@
+[
+  {
+    "agent": "Cursor",
+    "model": "gpt-4",
+    "timestamp": "2026-03-10T10:30:00Z",
+    "user_prompt": "How do I implement authentication in a React app?",
+    "ai_response": "I'll help you implement authentication in a React app. Here's a complete example using JWT tokens and localStorage...",
+    "repository_url": "https://github.com/example/react-app",
+    "repository_name": "react-app",
+    "branch": "main",
+    "task_type": "feature-implementation",
+    "file_path": "src/auth/AuthContext.tsx",
+    "language": "typescript",
+    "tags": ["authentication", "jwt", "react"]
+  },
+  {
+    "agent": "ClaudeCode",
+    "model": "claude-3.5-sonnet",
+    "timestamp": "2026-03-10T11:15:00Z",
+    "user_prompt": "Can you refactor this component to use hooks?",
+    "ai_response": "I'll refactor this class-based component to use React hooks. Here's the refactored version...",
+    "repository_url": "https://github.com/example/react-app",
+    "repository_name": "react-app",
+    "branch": "feature/refactoring",
+    "task_type": "refactoring",
+    "file_path": "src/components/UserProfile.tsx",
+    "language": "typescript",
+    "tags": ["refactoring", "hooks", "react"]
+  },
+  {
+    "agent": "ChatGPT",
+    "model": "gpt-4-turbo",
+    "timestamp": "2026-03-09T14:20:00Z",
+    "user_prompt": "Help me fix this bug in the API",
+    "ai_response": "Looking at your code, I can see the issue. The problem is in the async function handling...",
+    "repository_url": "https://github.com/example/api-server",
+    "repository_name": "api-server",
+    "branch": "fix/api-bug",
+    "task_type": "bug-fix",
+    "file_path": "src/api/routes/users.ts",
+    "language": "typescript",
+    "tags": ["bug-fix", "api", "typescript"]
+  },
+  {
+    "agent": "Cursor",
+    "model": "gpt-4",
+    "timestamp": "2026-03-09T16:45:00Z",
+    "user_prompt": "Write unit tests for the authentication module",
+    "ai_response": "I'll write comprehensive unit tests for the authentication module using Jest and React Testing Library...",
+    "repository_url": "https://github.com/example/react-app",
+    "repository_name": "react-app",
+    "branch": "main",
+    "task_type": "testing",
+    "file_path": "src/auth/__tests__/AuthContext.test.tsx",
+    "language": "typescript",
+    "tags": ["testing", "jest", "authentication"]
+  }
+]
