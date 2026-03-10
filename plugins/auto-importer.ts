@@ -115,6 +115,23 @@ export class AutoImporter {
     const tool = this.tools.find(t => t.name === toolName);
     if (!tool) return null;
 
+    // For Cursor, prioritize History directory which contains actual conversations
+    if (toolName === 'cursor') {
+      const historyDir = path.join(os.homedir(), 'Library/Application Support/Cursor/User/History');
+      try {
+        const stats = await fs.stat(historyDir);
+        if (stats.isDirectory()) {
+          const entries = await fs.readdir(historyDir);
+          if (entries.length > 0) {
+            console.log('   📂 Found History directory with', entries.length, 'sessions');
+            return historyDir;
+          }
+        }
+      } catch (error) {
+        // Continue to other paths
+      }
+    }
+
     // Check config paths
     for (const configPath of tool.configPaths) {
       try {
