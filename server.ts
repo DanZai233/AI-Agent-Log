@@ -53,6 +53,23 @@ async function startServer() {
   const app = express();
   app.use(express.json());
 
+  // Health check endpoint
+  app.get('/api/health', (req, res) => {
+    try {
+      const count = db.prepare('SELECT COUNT(*) as count FROM logs').get() as { count: number };
+      res.json({
+        status: 'ok',
+        database: 'connected',
+        totalLogs: count.count
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 'error',
+        message: 'Database error'
+      });
+    }
+  });
+
   app.get('/api/logs', (req, res) => {
     const date = req.query.date as string;
     const agent = req.query.agent as string;
@@ -299,9 +316,28 @@ async function startServer() {
     app.use(express.static('dist'));
   }
 
-  const PORT = 3000;
+  const PORT = parseInt(process.env.PORT || '3000', 10);
+
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`\n${'='.repeat(50)}`);
+    console.log('🚀 Agent Log Server Started');
+    console.log(`${'='.repeat(50)}`);
+    console.log(`\n📍 API Endpoints:`);
+    console.log(`   GET  http://localhost:${PORT}/api/health`);
+    console.log(`   GET  http://localhost:${PORT}/api/logs`);
+    console.log(`   POST http://localhost:${PORT}/api/logs`);
+    console.log(`   GET  http://localhost:${PORT}/api/search`);
+    console.log(`   GET  http://localhost:${PORT}/api/stats`);
+    console.log(`\n💻 Web UI: http://localhost:${PORT}`);
+    console.log(`${'='.repeat(50)}\n`);
+    
+    // Test database connection
+    try {
+      const test = db.prepare('SELECT COUNT(*) as count FROM logs').get() as { count: number };
+      console.log(`✅ Database connected (${test.count} records)\n`);
+    } catch (error) {
+      console.error('❌ Database error:', error);
+    }
   });
 }
 
